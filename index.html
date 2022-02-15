@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Challenge 30</title>
+</head>
+<body>
+  <div class="container">
+    
+    <header>
+      <div class="logo">
+        <span data-js="logo-name">Company Name</span>
+        <span data-js="phone">phone</span>
+      </div>
+    </header>
+
+    <form action="" data-js="form" id="form">
+      <div class="fieldset">
+        <label>Imagem</label>
+        <input 
+          type="text" 
+          id="carimg" 
+          data-js="carimg"
+          placeholder="Url da imagem"
+        >
+      </div>
+      <div class="fieldset">
+        <label>Marca</label>
+        <input 
+          type="text" 
+          id="brand" 
+          data-js="brand"
+        >
+      </div>
+      <div class="fieldset">
+        <label>Modelo</label>
+        <input 
+          type="text" 
+          id="model" 
+          data-js="model"
+        >
+      </div>
+      <div class="fieldset">
+        <label>Ano</label>
+        <input 
+          type="text" 
+          id="year" 
+          data-js="year"
+        >
+      </div>
+      <div class="fieldset">
+        <label>Placa</label>
+        <input 
+          type="text" 
+          id="board" 
+          data-js="board"
+        >
+      </div>
+      <div class="fieldset">
+        <label>Cor</label>
+        <input 
+          type="text" 
+          id="color" 
+          data-js="color"
+        >
+      </div>
+      <div class="fieldset button">
+        <button 
+          type="submit"
+        >
+          Cadastrar
+      </button>
+      </div>
+    </form>
+
+    <h2>Carros</h2>
+    <div class="catalog" data-js="catalog"></div>
+  </div>
+  <script src="dom.js"></script>
+  <script src="30-Paulo_Santana.js"></script>
+</body>
+</html>
