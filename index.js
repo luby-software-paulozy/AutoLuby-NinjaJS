@@ -33,7 +33,19 @@
       color: $colorInput.value,
     });
 
-    populateHTML();
+    let car = `image=${$imgInput.value}&brand=${$brandInput.value}&model=${$modelInput.value}&year=${$yearInput.value}&plate=${$boardInput.value}&color=${$colorInput.value}`;
+
+    addCar(car);
+
+    getCars((err, data) => {
+      if (err) {
+        console.log(err);
+      }
+
+      let cars = JSON.parse(data);
+      populateHTML(cars);
+    });
+
     $form.get()[0].reset();
   }
 
@@ -47,7 +59,7 @@
     cars.pop(carForRemove);
   }
 
-  function populateHTML() {
+  function populateHTML(array) {
     let $cardCatalog = document.createElement("div");
     let $deleteCardButton = document.createElement("button");
 
@@ -56,11 +68,11 @@
     $cardCatalog.id = cardId += 1;
     $deleteCardButton.addEventListener("click", removeCarHandler);
 
-    cars.forEach((car) => {
+    array.forEach((car) => {
       let HTMLTemplate = `
         <div class="box-image">
           <img
-            src="${car.img}"
+            src="${car.image}"
             alt=""
             class="car-image"
           >
@@ -71,7 +83,7 @@
             <span>Ano: ${car.year}</span>
           </div>
           <div class="board-color">
-            <span>Placa: ${car.board}</span>
+            <span>Placa: ${car.plate}</span>
             <span>Cor: ${car.color}</span>
           </div>
         </div>
@@ -115,6 +127,50 @@
       $colorInput.value === "";
 
     return isEmpty;
+  }
+
+  function getCars(callback) {
+    let request = new XMLHttpRequest();
+
+    request.addEventListener("readystatechange", () => {
+      let isRequestOk = request.readyState === 4 && request.status === 200;
+      let isRequestNotOk = request.readyState === 4;
+
+      if (isRequestOk) {
+        return callback(null, request.responseText);
+      }
+
+      if (isRequestNotOk) {
+        return callback("errinho", null);
+      }
+    });
+
+    request.open("GET", "http://localhost:3000/car", true);
+    request.send();
+  }
+
+  function addCar(carObj) {
+    let request = new XMLHttpRequest();
+
+    request.addEventListener("readystatechange", () => {
+      let isRequestOk = request.readyState === 4 && request.status === 200;
+      let isRequestNotOk = request.readyState === 4;
+
+      if (isRequestOk) {
+        return;
+      }
+
+      if (isRequestNotOk) {
+        return alert("n foi possivel enviar os dados");
+      }
+    });
+
+    request.open("POST", "http://localhost:3000/car");
+    request.setRequestHeader(
+      "Content-Type",
+      "application/x-www-form-urlencoded"
+    );
+    request.send(carObj);
   }
 
   getCompanyInfo((err, data) => {
