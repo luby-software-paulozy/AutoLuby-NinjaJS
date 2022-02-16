@@ -12,54 +12,99 @@
   let $companyName = new DOM('[data-js="logo-name"]').get()[0];
   let $companyPhone = new DOM('[data-js="phone"]').get()[0];
 
-  let carID = 0;
   let cardId = 0;
-  let cars = [];
+  let carID = 0;
+
+  $form.on("submit", handleSubmit);
+
+  populateHTML();
 
   function handleSubmit(e) {
     e.preventDefault();
+    validateFields();
 
-    if (validateFields()) {
-      return alert("Por favor preencher todos os campos");
-    }
-
-    cars.push({
-      id: (carID += 1),
-      img: $imgInput.value,
-      brand: $brandInput.value,
-      model: $modelInput.value,
-      year: $yearInput.value,
-      board: $boardInput.value,
-      color: $colorInput.value,
-    });
-
-    let car = `image=${$imgInput.value}&brand=${$brandInput.value}&model=${$modelInput.value}&year=${$yearInput.value}&plate=${$boardInput.value}&color=${$colorInput.value}`;
+    let car = `id=${(carID += 1)}&image=${$imgInput.value}&brand=${
+      $brandInput.value
+    }&model=${$modelInput.value}&year=${$yearInput.value}&plate=${
+      $boardInput.value
+    }&color=${$colorInput.value}`;
 
     addCar(car);
+    populateHTML();
+    $form.get()[0].reset();
+  }
 
+  function removeCarHandler(event) {
     getCars((err, data) => {
       if (err) {
         console.log(err);
       }
 
       let cars = JSON.parse(data);
-      populateHTML(cars);
+
+      let element = event.target.parentElement;
+      let carForRemove = cars.filter((car) => car.id === element.id);
+
+      removeCarRequest(carForRemove);
+      $catalogContainer.removeChild(element);
+    });
+  }
+
+  function removeCarRequest(car) {
+    let request = new XMLHttpRequest();
+
+    request.addEventListener("readystatechange", () => {
+      let isRequestOk = request.readyState === 4 && request.status === 200;
+      let isRequestNotOk = request.readyState === 4;
+
+      if (isRequestOk) {
+        return;
+      }
+
+      if (isRequestNotOk) {
+        return alert("n foi possivel excluir o carro");
+      }
     });
 
-    $form.get()[0].reset();
+    request.open("DELETE", `http://localhost:3000/car/${car.id}`);
+    request.send();
   }
 
-  function removeCarHandler(event) {
-    let element = event.target.parentElement;
+  function populateHTML() {
+    getCars((err, data) => {
+      if (err) {
+        console.log(err);
+      }
 
-    $catalogContainer.removeChild(element);
+      let cars = JSON.parse(data);
+      console.log(cars);
+      cars.forEach((car) => {
+        let HTMLTemplate = `
+          <div class="box-image">
+            <img
+              src="${car.image}"
+              alt=""
+              class="car-image"
+            >
+          </div>
+          <div class="box-info">
+            <div class="name-year">
+              <span>${car.brand}: ${car.model}</span>
+              <span>Ano: ${car.year}</span>
+            </div>
+            <div class="board-color">
+              <span>Placa: ${car.plate}</span>
+              <span>Cor: ${car.color}</span>
+            </div>
+          </div>
+          `;
 
-    let carForRemove = cars.filter((car) => car.id === Number(element.id));
-
-    cars.pop(carForRemove);
+        createCardCar(HTMLTemplate);
+      });
+    });
   }
 
-  function populateHTML(array) {
+  function createCardCar(html) {
     let $cardCatalog = document.createElement("div");
     let $deleteCardButton = document.createElement("button");
 
@@ -68,33 +113,11 @@
     $cardCatalog.id = cardId += 1;
     $deleteCardButton.addEventListener("click", removeCarHandler);
 
-    array.forEach((car) => {
-      let HTMLTemplate = `
-        <div class="box-image">
-          <img
-            src="${car.image}"
-            alt=""
-            class="car-image"
-          >
-        </div>
-        <div class="box-info">
-          <div class="name-year">
-            <span>${car.brand}: ${car.model}</span>
-            <span>Ano: ${car.year}</span>
-          </div>
-          <div class="board-color">
-            <span>Placa: ${car.plate}</span>
-            <span>Cor: ${car.color}</span>
-          </div>
-        </div>
-        `;
+    $cardCatalog.classList.add("card");
+    $cardCatalog.innerHTML = html;
+    $cardCatalog.appendChild($deleteCardButton);
 
-      $cardCatalog.classList.add("card");
-      $cardCatalog.innerHTML = HTMLTemplate;
-      $cardCatalog.appendChild($deleteCardButton);
-
-      return $catalogContainer.appendChild($cardCatalog);
-    });
+    return $catalogContainer.appendChild($cardCatalog);
   }
 
   function getCompanyInfo(callback) {
@@ -126,7 +149,11 @@
       $boardInput.value === "" ||
       $colorInput.value === "";
 
-    return isEmpty;
+    if (!isEmpty) {
+      return;
+    }
+
+    return alert("Por favor preencha todos os campos");
   }
 
   function getCars(callback) {
@@ -183,6 +210,4 @@
     $companyName.innerText = dataJson.name;
     $companyPhone.innerText = dataJson.phone;
   });
-
-  $form.on("submit", handleSubmit);
 })(window.DOM);
