@@ -9,8 +9,17 @@ router.get("/", function (req, res) {
   res.json(data);
 });
 
+router.delete("/:carID", (req, res) => {
+  let carID = req.params.carID;
+
+  let carIndex = data.indexOf(carID);
+
+  data.pop(carIndex);
+});
+
 router.post("/", function (req, res) {
   data.push({
+    id: req.body.id,
     image: req.body.image,
     brand: req.body.brand,
     model: req.body.model,
